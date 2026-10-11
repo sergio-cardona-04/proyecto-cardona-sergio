@@ -1,0 +1,24 @@
+# Variables de entorno y credenciales
+.env
+.env.*
+!.env.example
+
+# Dependencias
+**/vendor/
+**/node_modules/
+
+# Archivos temporales y registros
+*.log
+*.tmp
+*.cache
+
+# Configuración local del editor
+.vscode/
+.idea/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Resultados de pruebas
+coverage/
