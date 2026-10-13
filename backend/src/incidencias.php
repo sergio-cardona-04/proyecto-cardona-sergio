@@ -256,14 +256,33 @@ function crearIncidencia(): never
 
         $incidencia = $consulta->fetch();
 
+        
         // 13. Invalidar caché de listados
         $redis->incr('incidencias:version');
 
-        // 14. Responder con HTTP 201
+        // 14. Enviar notificación mediante Mailpit
+        $notificacion = 'enviada';
+
+        try {
+            enviarCorreoIncidencia($incidencia);
+
+        } catch (Throwable $error) {
+
+            // Registrar el error sin cancelar la creación
+            error_log(
+                'Error al enviar correo: ' . $error->getMessage()
+            );
+
+            $notificacion = 'no_enviada';
+        }
+
+        // 15. Responder con HTTP 201
         responder(201, [
             'mensaje' => 'Incidencia creada correctamente',
-            'incidencia' => $incidencia
+            'incidencia' => $incidencia,
+            'notificacion' => $notificacion
         ]);
+
 
     } catch (Throwable $error) {
 

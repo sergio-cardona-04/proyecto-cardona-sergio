@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/config.php';
+require __DIR__ . '/correo.php';
 require __DIR__ . '/incidencias.php';
 
 // Las respuestas de nuestra API serán JSON
