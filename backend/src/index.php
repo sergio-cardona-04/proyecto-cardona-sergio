@@ -63,6 +63,11 @@ if ($ruta === '/incidencias' && $metodo === 'GET') {
     listarIncidencias();
 }
 
+// Crear una nueva incidencia
+if ($ruta === '/incidencias' && $metodo === 'POST') {
+    crearIncidencia();
+}
+
 // Ruta no encontrada
 responder(404, [
     'error' => 'Ruta no encontrada'
