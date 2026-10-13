@@ -88,6 +88,29 @@ if (
     actualizarIncidencia($id);
 }
 
+// Eliminar una incidencia mediante su ID
+if (
+    $metodo === 'DELETE' &&
+    preg_match('#^/incidencias/([1-9][0-9]*)$#', $ruta, $coincidencias)
+) {
+    $id = filter_var(
+        $coincidencias[1],
+        FILTER_VALIDATE_INT,
+        ['options' => [
+            'min_range' => 1,
+            'max_range' => 4294967295
+        ]]
+    );
+
+    if ($id === false) {
+        responder(400, [
+            'error' => 'ID de incidencia inválido'
+        ]);
+    }
+
+    eliminarIncidencia($id);
+}
+
 // Ruta no encontrada
 responder(404, [
     'error' => 'Ruta no encontrada'

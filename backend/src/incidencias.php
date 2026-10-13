@@ -456,3 +456,57 @@ function actualizarIncidencia(int $id): never
         ]);
     }
 }
+
+/**
+ * Eliminar una incidencia existente
+ */
+function eliminarIncidencia(int $id): never
+{
+    try {
+        // 1. Conectar con Redis y MariaDB
+        $redis = conectarRedis();
+        $db = conectarMariaDB();
+
+        // 2. Preparar la consulta DELETE
+        $sql = '
+            DELETE FROM incidencias
+            WHERE id = :id
+        ';
+
+        $consulta = $db->prepare($sql);
+
+        // 3. Asignar el ID que queremos eliminar
+        $consulta->bindValue(
+            ':id',
+            $id,
+            PDO::PARAM_INT
+        );
+
+        // 4. Ejecutar la eliminación
+        $consulta->execute();
+
+        // 5. Verificar si realmente se eliminó un registro
+        if ($consulta->rowCount() === 0) {
+            responder(404, [
+                'error' => 'La incidencia no existe'
+            ]);
+        }
+
+        // 6. Invalidar la caché del listado
+        $redis->incr('incidencias:version');
+
+        // 7. Confirmar la eliminación
+        responder(200, [
+            'mensaje' => 'Incidencia eliminada correctamente',
+            'id_eliminado' => $id
+        ]);
+
+    } catch (Throwable $error) {
+
+        error_log($error->getMessage());
+
+        responder(503, [
+            'error' => 'No fue posible completar la eliminación'
+        ]);
+    }
+}
