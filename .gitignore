@@ -22,3 +22,6 @@ Thumbs.db
 
 # Resultados de pruebas
 coverage/
+
+# CSS compilado del frontend
+frontend/dist/
