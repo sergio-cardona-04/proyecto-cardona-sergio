@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Control de Incidencias</title>
+
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+</head>
+
+<body>
+    <main class="contenedor">
+
+        <header class="encabezado">
+            <div>
+                <p class="subtitulo">Infraestructura de Servicios</p>
+                <h1>Control de Incidencias</h1>
+                <p class="descripcion">
+                    Administración y seguimiento de incidencias técnicas.
+                </p>
+            </div>
+
+            <a href="http://localhost:8025"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="enlace">
+                Abrir Mailpit
+            </a>
+        </header>
+
+        <section class="resumen" aria-label="Resumen del sistema">
+
+            <article class="dato">
+                <span>Total de incidencias</span>
+                <strong id="total">—</strong>
+            </article>
+
+            <article class="dato">
+                <span>Origen de los datos</span>
+                <strong id="origen">—</strong>
+            </article>
+
+            <article class="dato">
+                <span>Consultas registradas</span>
+                <strong id="contador">—</strong>
+            </article>
+
+        </section>
+
+        <section class="panel">
+
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Incidencias registradas</h2>
+                    <p>
+                        Visualiza los registros almacenados en MariaDB.
+                    </p>
+                </div>
+
+                <button id="recargar" type="button">
+                    Actualizar listado
+                </button>
+            </div>
+
+            <p id="mensaje" role="status" aria-live="polite">
+                Cargando incidencias...
+            </p>
+
+            <div class="tabla-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Descripción</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                            <th>Fecha de creación</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tabla-incidencias"></tbody>
+                </table>
+            </div>
+
+            <nav class="paginacion" aria-label="Paginación">
+                <button id="anterior" type="button" disabled>
+                    Anterior
+                </button>
+
+                <span id="pagina">Página 1 de 1</span>
+
+                <button id="siguiente" type="button" disabled>
+                    Siguiente
+                </button>
+            </nav>
+
+        </section>
+
+        <footer>
+            Sistema de Control de Incidencias — Docker Compose
+        </footer>
+
+    </main>
+</body>
+
+</html>

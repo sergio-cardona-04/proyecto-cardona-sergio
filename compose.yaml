@@ -101,6 +101,32 @@ services:
 
     networks:
       - app_network
+  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:8081:80"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    networks:
+      - app_network
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null http://127.0.0.1/ || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
   app_network:
