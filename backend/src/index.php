@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/config.php';
+require __DIR__ . '/incidencias.php';
 
 // Las respuestas de nuestra API serán JSON
 header('Content-Type: application/json; charset=utf-8');
@@ -55,6 +56,11 @@ if ($ruta === '/health' && $metodo === 'GET') {
             'mensaje' => 'Dependencia no disponible'
         ]);
     }
+}
+
+// Consultar listado de incidencias
+if ($ruta === '/incidencias' && $metodo === 'GET') {
+    listarIncidencias();
 }
 
 // Ruta no encontrada
