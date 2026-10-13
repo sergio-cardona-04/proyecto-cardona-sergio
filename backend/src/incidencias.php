@@ -274,3 +274,185 @@ function crearIncidencia(): never
         ]);
     }
 }
+
+/**
+ * Actualizar una incidencia existente
+ */
+function actualizarIncidencia(int $id): never
+{
+    // 1. Verificar que recibimos JSON
+    $tipo = strtolower(trim(explode(
+        ';',
+        $_SERVER['CONTENT_TYPE'] ?? ''
+    )[0]));
+
+    if ($tipo !== 'application/json') {
+        responder(415, [
+            'error' => 'Se requiere Content-Type application/json'
+        ]);
+    }
+
+    // 2. Leer y decodificar los datos enviados
+    try {
+        $datos = json_decode(
+            file_get_contents('php://input'),
+            false,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+    } catch (JsonException $error) {
+        responder(400, [
+            'error' => 'El JSON enviado no es válido'
+        ]);
+    }
+
+    if (!$datos instanceof stdClass) {
+        responder(400, [
+            'error' => 'Se esperaba un objeto JSON'
+        ]);
+    }
+
+    // 3. Convertir el objeto en un arreglo de campos
+    $campos = get_object_vars($datos);
+
+    if (empty($campos)) {
+        responder(422, [
+            'error' => 'Debes enviar al menos un campo para actualizar'
+        ]);
+    }
+
+    // 4. Definir los campos permitidos
+    $camposPermitidos = [
+        'titulo',
+        'descripcion',
+        'categoria',
+        'estado'
+    ];
+
+    $categoriasValidas = [
+        'hardware',
+        'software',
+        'red',
+        'otro'
+    ];
+
+    $estadosValidos = [
+        'pendiente',
+        'en_proceso',
+        'resuelta'
+    ];
+
+    // 5. Validar todos los campos recibidos
+    foreach ($campos as $nombre => $valor) {
+
+        if (!in_array($nombre, $camposPermitidos, true)) {
+            responder(422, [
+                'error' => "El campo $nombre no se puede modificar"
+            ]);
+        }
+
+        if (!is_string($valor)) {
+            responder(422, [
+                'error' => "El campo $nombre debe ser texto"
+            ]);
+        }
+
+        $valor = trim($valor);
+
+        if ($nombre === 'titulo') {
+            if (mb_strlen($valor) < 3 || mb_strlen($valor) > 120) {
+                responder(422, [
+                    'error' => 'El título debe tener entre 3 y 120 caracteres'
+                ]);
+            }
+        }
+
+        if ($nombre === 'descripcion') {
+            if (mb_strlen($valor) < 10 || mb_strlen($valor) > 2000) {
+                responder(422, [
+                    'error' => 'La descripción debe tener entre 10 y 2000 caracteres'
+                ]);
+            }
+        }
+
+        if ($nombre === 'categoria') {
+            if (!in_array($valor, $categoriasValidas, true)) {
+                responder(422, [
+                    'error' => 'Categoría no válida'
+                ]);
+            }
+        }
+
+        if ($nombre === 'estado') {
+            if (!in_array($valor, $estadosValidos, true)) {
+                responder(422, [
+                    'error' => 'Estado no válido'
+                ]);
+            }
+        }
+
+        $campos[$nombre] = $valor;
+    }
+
+    try {
+        // 6. Conectar con MariaDB y Redis
+        $db = conectarMariaDB();
+        $redis = conectarRedis();
+
+        // 7. Verificar si la incidencia existe
+        $consulta = $db->prepare(
+            'SELECT id FROM incidencias WHERE id = :id'
+        );
+
+        $consulta->execute([':id' => $id]);
+
+        if (!$consulta->fetch()) {
+            responder(404, [
+                'error' => 'La incidencia no existe'
+            ]);
+        }
+
+        // 8. Construir dinámicamente los campos a actualizar
+        $asignaciones = [];
+        $parametros = [':id' => $id];
+
+        foreach ($campos as $nombre => $valor) {
+            $asignaciones[] = "$nombre = :$nombre";
+            $parametros[":$nombre"] = $valor;
+        }
+
+        // 9. Ejecutar la actualización
+        $sql = 'UPDATE incidencias SET ' .
+            implode(', ', $asignaciones) .
+            ' WHERE id = :id';
+
+        $consulta = $db->prepare($sql);
+        $consulta->execute($parametros);
+
+        // 10. Invalidar la caché anterior
+        $redis->incr('incidencias:version');
+
+        // 11. Consultar la incidencia actualizada
+        $consulta = $db->prepare(
+            'SELECT * FROM incidencias WHERE id = :id'
+        );
+
+        $consulta->execute([':id' => $id]);
+
+        $incidencia = $consulta->fetch();
+
+        // 12. Devolver respuesta
+        responder(200, [
+            'mensaje' => 'Incidencia actualizada correctamente',
+            'incidencia' => $incidencia
+        ]);
+
+    } catch (Throwable $error) {
+
+        error_log($error->getMessage());
+
+        responder(503, [
+            'error' => 'No fue posible completar la actualización'
+        ]);
+    }
+}
