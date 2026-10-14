@@ -1,29 +1,20 @@
 "use strict";
 
-// =======================================
-// 1. CONFIGURACIÓN Y ELEMENTOS DEL HTML
-// =======================================
-
 const API_URL = "/api/incidencias";
 const LIMITE = 5;
 
-// Tabla e indicadores
 const tabla = document.getElementById("tabla-incidencias");
 const mensaje = document.getElementById("mensaje");
 const total = document.getElementById("total");
 const origen = document.getElementById("origen");
 const contador = document.getElementById("contador");
-
-// Paginación
 const textoPagina = document.getElementById("pagina");
 const btnAnterior = document.getElementById("anterior");
 const btnSiguiente = document.getElementById("siguiente");
 const btnRecargar = document.getElementById("recargar");
 
-// Botón para crear
 const btnNueva = document.getElementById("nueva-incidencia");
 
-// Formulario
 const modal = document.getElementById("modal-incidencia");
 const formulario = document.getElementById("form-incidencia");
 const tituloModal = document.getElementById("titulo-modal");
@@ -38,18 +29,12 @@ const errorFormulario = document.getElementById("error-formulario");
 const btnGuardar = document.getElementById("guardar-incidencia");
 const btnCancelar = document.getElementById("cancelar-formulario");
 
-// Estado de la aplicación
 let paginaActual = 1;
 let totalPaginas = 1;
 let cargando = false;
 let procesando = false;
 let idEditando = null;
 let registrosActuales = [];
-
-
-// =======================================
-// 2. MENSAJES Y CONTROLES
-// =======================================
 
 function mostrarMensaje(texto, tipo = "normal") {
     mensaje.textContent = texto;
@@ -82,11 +67,6 @@ function limpiarErrorFormulario() {
     errorFormulario.classList.add("hidden");
 }
 
-
-// =======================================
-// 3. FUNCIÓN GENERAL PARA CONSUMIR LA API
-// =======================================
-
 async function peticionApi(url, opciones = {}) {
     const respuesta = await fetch(url, {
         cache: "no-store",
@@ -111,11 +91,6 @@ async function peticionApi(url, opciones = {}) {
 
     return datos;
 }
-
-
-// =======================================
-// 4. MOSTRAR LAS INCIDENCIAS EN LA TABLA
-// =======================================
 
 const clasesEstado = {
     pendiente:
@@ -225,11 +200,6 @@ function mostrarIncidencias(incidencias) {
         tabla.appendChild(fila);
     }
 }
-
-
-// =======================================
-// 5. GET: CONSULTAR Y PAGINAR
-// =======================================
 
 async function cargarIncidencias(pagina = 1, aviso = "") {
     if (cargando) return;

@@ -5,7 +5,6 @@ declare(strict_types=1);
 // Obtener el listado de incidencias
 function listarIncidencias(): never
 {
-    // 1. Leer parámetros de paginación
     $pagina = filter_var(
         $_GET['pagina'] ?? 1,
         FILTER_VALIDATE_INT,

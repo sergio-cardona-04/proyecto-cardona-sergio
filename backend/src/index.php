@@ -5,11 +5,9 @@ require __DIR__ . '/config.php';
 require __DIR__ . '/correo.php';
 require __DIR__ . '/incidencias.php';
 
-// Las respuestas de nuestra API serán JSON
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
-// Función para enviar respuestas HTTP
 function responder(int $codigo, array $datos): never
 {
     http_response_code($codigo);
@@ -22,7 +20,6 @@ function responder(int $codigo, array $datos): never
     exit;
 }
 
-// Obtener la ruta y método de la petición
 $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 $ruta = parse_url(
@@ -59,17 +56,14 @@ if ($ruta === '/health' && $metodo === 'GET') {
     }
 }
 
-// Consultar listado de incidencias
 if ($ruta === '/incidencias' && $metodo === 'GET') {
     listarIncidencias();
 }
 
-// Crear una nueva incidencia
 if ($ruta === '/incidencias' && $metodo === 'POST') {
     crearIncidencia();
 }
 
-// Actualizar una incidencia mediante su ID
 if (
     $metodo === 'PUT' &&
     preg_match('#^/incidencias/([1-9][0-9]*)$#', $ruta, $coincidencias)
@@ -89,7 +83,6 @@ if (
     actualizarIncidencia($id);
 }
 
-// Eliminar una incidencia mediante su ID
 if (
     $metodo === 'DELETE' &&
     preg_match('#^/incidencias/([1-9][0-9]*)$#', $ruta, $coincidencias)
@@ -112,7 +105,6 @@ if (
     eliminarIncidencia($id);
 }
 
-// Ruta no encontrada
 responder(404, [
     'error' => 'Ruta no encontrada'
 ]);

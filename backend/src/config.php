@@ -16,7 +16,6 @@ function entorno(string $nombre): string
     return $valor;
 }
 
-// Conexión con MariaDB
 function conectarMariaDB(): PDO
 {
     $dsn = sprintf(
@@ -39,7 +38,6 @@ function conectarMariaDB(): PDO
     );
 }
 
-// Conexión con Redis
 function conectarRedis(): Redis
 {
     $redis = new Redis();
