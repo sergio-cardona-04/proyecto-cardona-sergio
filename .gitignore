@@ -1,4 +1,3 @@
-# Variables de entorno y credenciales
 .env
 .env.*
 !.env.example
@@ -12,16 +11,12 @@
 *.tmp
 *.cache
 
-# Configuración local del editor
 .vscode/
 .idea/
 
-# Archivos del sistema operativo
 .DS_Store
 Thumbs.db
 
-# Resultados de pruebas
 coverage/
 
-# CSS compilado del frontend
 frontend/dist/

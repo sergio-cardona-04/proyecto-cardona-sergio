@@ -1,6 +1,5 @@
 FROM php:8.3-apache
 
-# Instalar dependencias del sistema y PHP
 RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     libonig-dev \
@@ -12,7 +11,6 @@ RUN apt-get update && apt-get install -y \
     && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
 
-# Configurar Apache
 RUN printf '<Directory /var/www/html>\n\
     AllowOverride All\n\
     Require all granted\n\
@@ -20,10 +18,8 @@ RUN printf '<Directory /var/www/html>\n\
     > /etc/apache2/conf-available/incidencias.conf \
     && a2enconf incidencias
 
-# Obtener Composer desde su imagen oficial
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
-# Instalar dependencias fuera del directorio público
 WORKDIR /opt/incidencias
 
 COPY composer.json composer.lock ./
@@ -35,7 +31,6 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer install \
     --no-progress \
     --optimize-autoloader
 
-# Preparar el código del servidor
 WORKDIR /var/www/html
 
 COPY ./src/ /var/www/html/
